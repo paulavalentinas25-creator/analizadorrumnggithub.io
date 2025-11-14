@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Videos UMNG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos UMNG */
+        :root {
+            --color-umng-rojo: #9E1B32; /* Borgoña/Rojo Institucional */
+            --color-umng-dorado: #FFD700; /* Dorado */
+            --color-umng-azul: #002D62; /* Azul Marino */
+        }
+        body {
+            font-family: 'Inter', 'Inter var', sans-serif;
+            background-color: #f4f4f7;
+            /* Fondo que ya funciona: fondo.jpg */
+            background-image: url('fondo.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+        }
+        /* Capa de opacidad para la imagen de fondo (80% de opacidad) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Fondo base con 80% de opacidad para que el texto se lea */
+            background-color: rgba(244, 244, 247, 0.8); 
+            z-index: -1;
+        }
+        .bg-umng-main {
+            background-color: var(--color-umng-rojo);
+        }
+        .text-umng-main {
+            color: var(--color-umng-rojo);
+        }
+        .border-umng-main {
+            border-color: var(--color-umng-rojo);
+        }
+        .btn-umng {
+            background-color: var(--color-umng-azul);
+            color: white;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .btn-umng:hover {
+            background-color: #004790;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        }
+        .break-all {
+            word-break: break-all;
+        }
+        .aspect-square {
+            aspect-ratio: 1 / 1;
+        }
+        /* Regla para hacer la columna de entrada STICKY */
+        @media (min-width: 1024px) {
+            .lg-sticky-sidebar {
+                position: sticky;
+                top: 2rem; /* Distancia desde la parte superior */
+                align-self: flex-start;
+            }
+        }
+
+        /* Estilo para el botón de play sobre la miniatura */
+        #videoPlayer {
+            position: relative;
+            cursor: pointer;
+        }
+        #playButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+        }
+        #videoPlayer:hover #playButton {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="bg-umng-main text-white p-4 rounded-t-xl mb-8 shadow-xl max-w-7xl mx-auto flex items-center">
+        
+        <div class="h-16 w-auto mr-4 p-1 bg-white rounded-lg shadow-inner border-2 border-yellow-400 flex items-center justify-center overflow-hidden"> 
+             <img src="umng.jpg" alt="Logo UMNG" class="h-full w-full object-contain"> 
+        </div>
+        
+        <h1 class="text-3xl font-extrabold border-l-4 border-yellow-400 pl-4 py-2">UMNG Video Research Tool</h1>
+    </header>
+
+    <div class="lg:flex lg:space-x-8 max-w-7xl mx-auto">
+
+        <div class="lg:w-1/3 space-y-8 lg-sticky-sidebar mb-8 lg:mb-0">
+            
+            <div class="bg-white p-6 rounded-xl card-shadow border-t-4 border-umng-main">
+                <h2 class="text-xl font-bold mb-4 text-umng-main flex items-center">
+                    <span class="mr-2 text-umng-dorado">1️⃣</span> Ingrese el Video y Analice
+                </h2>
+                
+                <label for="videoUrl" class="block text-sm font-medium text-gray-700 mb-1">URL del Video (Youtube, Vimeo, etc.)</label>
+                <input type="url" id="videoUrl" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-umng-main focus:border-umng-main mb-4" value="https://youtu.be/bM7GPeAzavU?si=_WW2ZdLKQ8dfKlUq" placeholder="Ej: https://youtu.be/..." />
+                
+                <div class="bg-gray-100 p-3 rounded-lg mb-6 border border-gray-300">
+                    <p class="font-semibold text-sm text-umng-main mb-2">Videos de Simulación (Copiar y pegar):</p>
+                    <ul class="text-xs space-y-1 break-all">
+                        <li class="hover:bg-gray-200 p-1 rounded-sm cursor-pointer" onclick="document.getElementById('videoUrl').value='https://youtu.be/bM7GPeAzavU'">
+                            <span class="font-bold">1. UMNG-BIO (Tomate):</span> https://youtu.be/bM7GPeAzavU
+                        </li>
+                        <li class="hover:bg-gray-200 p-1 rounded-sm cursor-pointer" onclick="document.getElementById('videoUrl').value='https://unimilitareduco-my.sharepoint.com/personal/wilmar_diaz_unimilitar_edu_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fwilmar%5Fdiaz%5Funimilitar%5Fedu%5Fco%2FDocuments%2Fvideos%2F2022%2D2%2FPlagio%2Emp4&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E942ce802%2D3d6d%2D4bfd%2D9702%2Daa96d88d0f94'">
+                            <span class="font-bold">2. Plagio (SharePoint):</span> https://unimilitareduco-my.sharepoint.com/...
+                        </li>
+                        <li class="hover:bg-gray-200 p-1 rounded-sm cursor-pointer" onclick="document.getElementById('videoUrl').value='https://youtu.be/oIw4B7XbZ-g'">
+                            <span class="font-bold">3. Institucional:</span> https://youtu.be/oIw4B7XbZ-g
+                        </li>
+                    </ul>
+                </div>
+                <label for="videoTitle" class="block text-sm font-medium text-gray-700 mb-1">Título o Tema del Video (Opcional)</label>
+                <input type="text" id="videoTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-umng-main focus:border-umng-main mb-6" value="Proyecto UMNG-BIO Tomate" placeholder="Ej: Introducción a la Termodinámica" />
+
+                <button onclick="analyzeVideo()" class="btn-umng w-full py-3 rounded-lg font-bold text-lg hover:shadow-lg">
+                    Cargar Video y Analizar con Gemini
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl card-shadow border-t-4 border-umng-main">
+                <h2 class="text-xl font-bold mb-4 text-umng-main flex items-center">
+                    <span class="mr-2 text-umng-dorado">2️⃣</span> Reproductor del Video
+                </h2>
+                <div id="videoPlayer" class="aspect-video bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                    <img id="videoThumbnail" src="https://placehold.co/600x400/F4F4F7/666666?text=Miniatura+del+Video" alt="Miniatura simulada del video" class="w-full h-full object-cover">
+                    
+                    <svg id="playButton" class="w-20 h-20 text-white opacity-80" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 4.5v15l12-7.5-12-7.5z"/>
+                        <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="2" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="lg:w-2/3 space-y-8">
+            <div class="bg-white p-8 rounded-xl card-shadow border-t-4 border-umng-main">
+                <h2 class="text-xl font-bold mb-6 text-umng-main flex items-center">
+                    <span class="mr-2 text-umng-dorado">3️⃣</span> Resultados del Análisis Académico (Gemini)
+                </h2>
+                
+                <div id="analysisResults" class="space-y-6">
+                    <p class="text-gray-500 italic">Ingrese un video y presione **"Cargar Video y Analizar"** para ver los resultados.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA SIMULADA ---
+        const SIMULATION_DATA = {
+            "https://youtu.be/bM7GPeAzavU": {
+                thumbnail: "https://i.ytimg.com/vi/bM7GPeAzavU/hqdefault.jpg", 
+                summary: "Este proyecto institucional de la UMNG, financiado por regalías, se centra en apoyar a los productores de tomate en Cundinamarca (Fomeque y Sopó). El objetivo principal es incorporar la tecnología UMNG Bio, que sustituye los agrotóxicos por controladores biológicos para el manejo de plagas. Esto busca fortalecer la seguridad alimentaria regional, aumentar la competitividad del producto mediante la calidad y garantizar que los tomates lleguen a los hogares con cero químicos, cumpliendo así con el principio fundamental de la Universidad de salvar vidas y nutrir pertinentemente.",
+                keywords: ["Controladores Biológicos", "Seguridad Alimentaria", "UMNG Bio", "Producción de Tomate", "Agrotóxicos", "Regalías"],
+                redundancy: "El video reitera el impacto social y el beneficio de 'cero químicos' en tres ocasiones distintas (min 1:30, 2:10 y 2:45). Esto es intencional para reforzar el mensaje clave, pero podría condensarse en una exposición más breve."
+            },
+            "https://unimilitareduco-my.sharepoint.com/personal/wilmar_diaz_unimilitar_edu_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fwilmar%5Fdiaz%5Funimilitar%5Fedu%5Fco%2FDocuments%2Fvideos%2F2022%2D2%2FPlagio%2Emp4&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E942ce802%2D3d6d%2D4bfd%2D9702%2Daa96d88d0f94": {
+                thumbnail: "https://placehold.co/600x400/9E1B32/FFD700?text=VIDEO+PLAGIO+UMNG",
+                summary: "Este video académico define el plagio en el ámbito de la propiedad intelectual, diferenciando los derechos morales (paternidad, integridad de la obra) de los derechos económicos (reproducción, distribución). Se advierte sobre las implicaciones éticas y legales del plagio en el contexto universitario y la importancia de la citación correcta para salvaguardar la autoría y la integridad académica del estudiante.",
+                keywords: ["Plagio", "Propiedad Intelectual", "Derechos de Autor", "Integridad Académica", "Citación"],
+                redundancy: "El concepto de 'Derechos de Autor' y la necesidad de 'Citar' son mencionados al inicio y al final del video (introducción y conclusión). Se recomienda fusionar los puntos clave sobre la norma de citación para una explicación más fluida."
+            },
+            "https://youtu.be/oIw4B7XbZ-g": {
+                thumbnail: "https://i.ytimg.com/vi/oIw4B7XbZ-g/hqdefault.jpg", 
+                summary: "Este video institucional narra la historia y evolución de la Universidad Militar Nueva Granada. Inicia con sus origenes en 1962, ligados a la Escuela Militar de Cadetes [00:00:33], y su reconocimiento formal como universidad en 1982 [00:01:27]. Destaca hitos clave como su cambio a ente universitario autónomo en 2003 [00:02:20], la obtención de la Acreditación Institucional de Alta Calidad en 2015 [00:03:06], y la expansión con la sede Campus Nueva Granada en Cajicá en 2009 [00:04:13]. El video también resalta las cifras de la institución (programas, docentes, estudiantes y más de 51,000 egresados [00:06:57]), enfatizando su fomento de la investigación y la innovación [00:08:00].",
+                keywords: ["Historia UMNG", "Acreditación Alta Calidad", "Campus Nueva Granada", "Video Institucional", "Evolución Académica", "Sedes"],
+                redundancy: "El lema 'compromiso granadino con la excelencia' se menciona al inicio [00:00:21] y se repite al final del video [00:08:50], sirviendo como un marco estructural para reforzar la misión de la universidad."
+            }
+        };
+
+        function getBaseUrl(url) {
+            try {
+                const urlObject = new URL(url);
+                if (urlObject.hostname.includes('youtube.com') || urlObject.hostname.includes('youtu.be')) {
+                    let videoId = '';
+                    if (urlObject.hostname.includes('youtu.be')) {
+                        videoId = urlObject.pathname.substring(1).split('?')[0];
+                    } else {
+                        videoId = urlObject.searchParams.get('v');
+                    }
+                    
+                    if (!videoId && urlObject.pathname.includes('/embed/')) {
+                         videoId = urlObject.pathname.split('/embed/')[1].split('?')[0];
+                    }
+                    
+                    if (!videoId && urlObject.pathname.includes('/watch')) {
+                         videoId = urlObject.searchParams.get('v');
+                    }
+
+                    if (videoId === 'bM7GPeAzavU') return 'https://youtu.be/bM7GPeAzavU';
+                    if (videoId === 'oIw4B7XbZ-g') return 'https://youtu.be/oIw4B7XbZ-g';
+                    
+                     return `https://youtu.be/${videoId}`;
+                }
+                return url;
+            } catch (e) {
+                return url.trim(); 
+            }
+        }
+
+        function analyzeVideo() {
+            const urlInput = document.getElementById('videoUrl').value.trim();
+            const baseUrl = getBaseUrl(urlInput);
+            const data = SIMULATION_DATA[baseUrl];
+            const resultsDiv = document.getElementById('analysisResults');
+            const thumbnailImg = document.getElementById('videoThumbnail');
+            const playButton = document.getElementById('playButton');
+
+            // 1. Mostrar mensaje de "Analizando..." (Simulación del Contador)
+            resultsDiv.innerHTML = `
+                <div class="flex items-center space-x-3 p-4 bg-gray-50 border border-umng-main rounded-lg text-umng-main font-semibold">
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p>Analizando video... por favor espere 4 segundos (Simulación de IA)...</p>
+                </div>
+            `;
+            // Muestra la miniatura si hay datos, si no, usa el placeholder por defecto antes de que el análisis dé error.
+            thumbnailImg.src = data ? data.thumbnail : "https://placehold.co/600x400/F4F4F7/666666?text=Miniatura+del+Video";
+            playButton.style.display = 'block';
+
+
+            // 2. Programar la visualización de los resultados finales después de 4 segundos
+            setTimeout(() => {
+                if (!data) {
+                    resultsDiv.innerHTML = `
+                        <div class="p-4 bg-red-100 border border-red-500 rounded-lg">
+                            <p class="text-red-600 font-bold">Error: Video no Encontrado</p>
+                            <p class="text-gray-700">La URL ingresada no corresponde a uno de los videos de simulación. Por favor, use una de las 3 URLs de la lista de abajo.</p>
+                            <p class="text-gray-500 text-sm mt-2">URL buscada: ${baseUrl}</p>
+                        </div>
+                    `;
+                    // Minatura de error
+                    thumbnailImg.src = "https://placehold.co/600x400/9E1B32/FFD700?text=UMNG:+Error+Video+No+Simulado";
+                    return;
+                }
+                
+                // Muestra la miniatura correcta
+                thumbnailImg.src = data.thumbnail;
+                
+                // Generación de Palabras Clave
+                let keywordsHtml = data.keywords.map(kw => `<span class="inline-block bg-yellow-200 text-black text-xs px-3 py-1 rounded-full mr-2 mb-2 font-medium">${kw}</span>`).join('');
+
+                resultsDiv.innerHTML = `
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
+                        <p class="font-bold">Advertencia Crítica del Sistema (Simulada)</p>
+                        <p class="text-sm">El resumen que ve a continuación fue generado por el Asistente para la simulación, demostrando cómo se vería el análisis final.</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-umng-azul flex items-center mb-4 border-b pb-2 border-gray-200">
+                        <span class="mr-2 text-umng-dorado">💡</span> Mini Resumen de Partes Importantes
+                    </h3>
+                    <p class="text-gray-700 mb-8 leading-relaxed">${data.summary}</p>
+
+                    <h3 class="text-xl font-bold text-umng-azul flex items-center mb-4 border-b pb-2 border-gray-200">
+                        <span class="mr-2 text-umng-dorado">🏷️</span> Palabras Clave (Keywords)
+                    </h3>
+                    <div class="mb-8">${keywordsHtml}</div>
+
+                    <h3 class="text-xl font-bold text-umng-azul flex items-center mb-4 border-b pb-2 border-gray-200">
+                        <span class="mr-2 text-umng-dorado">⚠️</span> Advertencia de Redundancia
+                    </h3>
+                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg italic text-base text-gray-700">
+                        ${data.redundancy}
+                    </div>
+                `;
+                
+                // Ocultar botón de play (simulación de que el video comenzaría)
+                playButton.style.display = 'none';
+
+            }, 4000); // 4 segundos de simulación
+        }
+
+    </script>
+</body>
+</html>
